@@ -20,13 +20,13 @@ import java.util.List;
 @AutoService(UserStorageProviderFactory.class)
 public class DBUserStorageProviderFactory implements UserStorageProviderFactory<DBUserStorageProvider> {
 
-    public static final String PARAMETER_PLACEHOLDER_HELP = "Use '?' as parameter placeholder character (replaced only once). ";
-    public static final String DEFAULT_HELP_TEXT          = "Select to query all users you must return at least: \"id\". " +
+    private static final String PARAMETER_PLACEHOLDER_HELP = "Use '?' as parameter placeholder character (replaced only once). ";
+    private static final String DEFAULT_HELP_TEXT          = "Select to query all users you must return at least: \"id\". " +
             "            \"username\"," +
             "            \"email\" (opcional)," +
             "            \"firstName\" (opcional)," +
             "            \"lastName\" (opcional). Any other parameter can be mapped by aliases to a realm scope";
-    public static final String PARAMETER_HELP             = " The %s is passed as query parameter.";
+    private static final String PARAMETER_HELP             = " The %s is passed as query parameter.";
 
 
     private DataSourceProvider  dataSourceProvider = new DataSourceProvider();
@@ -49,7 +49,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
         String user     = config.get("user");
         String password = config.get("password");
         String url      = config.get("url");
-        dataSourceProvider.configure(url, user, password);
+        RDMS   rdbms    = RDMS.getByDescription(config.get("rdbms"));
+        dataSourceProvider.configure(url, rdbms, user, password);
         queryConfigurations = new QueryConfigurations(
                 config.get("count"),
                 config.get("listAll"),
@@ -57,7 +58,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 config.get("findByUsername"),
                 config.get("findBySearchTerm"),
                 config.get("findPasswordHash"),
-                config.get("hashFunction")
+                config.get("hashFunction"),
+                rdbms
         );
         configured = true;
     }
@@ -102,7 +104,7 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 .defaultValue("password")
                 .add()
                 .property()
-                .name("rdms")
+                .name("rdbms")
                 .label("RDBMS")
                 .helpText("Relational Database Management System")
                 .type(ProviderConfigProperty.LIST_TYPE)

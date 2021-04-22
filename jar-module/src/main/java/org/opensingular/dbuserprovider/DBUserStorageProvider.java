@@ -5,7 +5,6 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -41,6 +40,13 @@ public class DBUserStorageProvider implements UserStorageProvider,
         this.model = model;
         this.repository = new UserRepository(dataSourceProvider, queryConfigurations);
     }
+
+
+    private List<UserModel> toUserModel(RealmModel realm, List<Map<String, String>> users) {
+        return users.stream()
+                .map(m -> new UserAdapter(session, realm, model, m)).collect(Collectors.toList());
+    }
+
 
     @Override
     public boolean supportsCredentialType(String credentialType) {
@@ -107,7 +113,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
     @Override
     public void close() {
-        log.infov("closing");
+        log.debugv("closing");
     }
 
     @Override
@@ -145,9 +151,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
         log.infov("list users: realm={0}", realm.getId());
 
-        return repository.getAllUsers().stream()
-                .map(user -> new UserAdapter(session, realm, model, user))
-                .collect(Collectors.toList());
+        return toUserModel(realm, repository.getAllUsers());
     }
 
     @Override
@@ -155,7 +159,8 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
         log.infov("list users: realm={0} firstResult={1} maxResults={2}", realm.getId(), firstResult, maxResults);
 
-        return getUsers(realm);
+        return toUserModel(realm, repository.findUsersPaged(null, firstResult, maxResults));
+
     }
 
     @Override
@@ -163,9 +168,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
         log.infov("search for users: realm={0} search={1}", realm.getId(), search);
 
-        return repository.findUsers(search).stream()
-                .map(user -> new UserAdapter(session, realm, model, user))
-                .collect(Collectors.toList());
+        return toUserModel(realm, repository.findUsers(search));
     }
 
     @Override
@@ -180,24 +183,15 @@ public class DBUserStorageProvider implements UserStorageProvider,
     public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm) {
 
         log.infov("search for users with params: realm={0} params={1}", realm.getId(), params);
-        if (params.isEmpty()) {
-            return getUsers(realm);
-        }
 
-        return Collections.emptyList();
+        return toUserModel(realm, repository.findUsers(params.values().stream().findFirst().orElse(null)));
     }
 
     @Override
     public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm, int firstResult, int maxResults) {
 
         log.infov("search for users with params: realm={0} params={1} firstResult={2} maxResults={3}", realm.getId(), params, firstResult, maxResults);
-        
-        if (params.isEmpty()) {
-            return getUsers(realm).subList(firstResult, maxResults);
-        }
-
-
-        return Collections.emptyList();
+        return toUserModel(realm, repository.findUsersPaged(null, firstResult, maxResults));
     }
 
     @Override
@@ -221,6 +215,6 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
         log.infov("search for group members: realm={0} attrName={1} attrValue={2}", realm.getId(), attrName, attrValue);
 
-        return null;
+        return Collections.emptyList();
     }
 }

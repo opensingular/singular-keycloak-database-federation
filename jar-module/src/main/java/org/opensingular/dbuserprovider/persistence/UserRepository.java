@@ -8,6 +8,8 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.mindrot.jbcrypt.BCrypt;
 import org.opensingular.dbuserprovider.DBUserStorageException;
 import org.opensingular.dbuserprovider.model.QueryConfigurations;
+import org.opensingular.dbuserprovider.util.PagingUtil;
+import org.opensingular.dbuserprovider.util.PagingUtil.Pageable;
 
 import javax.sql.DataSource;
 import java.security.MessageDigest;
@@ -39,24 +41,20 @@ public class UserRepository {
         this.queryConfigurations = queryConfigurations;
     }
 
-    private class Pageable {
-        int first;
-        int max;
-    }
 
     private <T> T doQuery(String query, Pageable pageable, Function<ResultSet, T> resultTransformer, Object... params) {
         Optional<DataSource> dataSourceOpt = dataSourceProvider.getDataSource();
         if (dataSourceOpt.isPresent()) {
             DataSource dataSource = dataSourceOpt.get();
             try (Connection c = dataSource.getConnection()) {
+                if (pageable != null) {
+                    query = PagingUtil.formatScriptWithPageable(query, pageable, queryConfigurations.getRdms());
+                }
                 PreparedStatement statement = c.prepareStatement(query);
                 if (params != null) {
                     for (int i = 1; i <= params.length; i++) {
                         statement.setObject(i, params[i - 1]);
                     }
-                }
-                if (pageable != null) {
-                    //TODO suport pageable
                 }
                 try (ResultSet rs = statement.executeQuery()) {
                     return resultTransformer.apply(rs);
@@ -162,7 +160,8 @@ public class UserRepository {
         throw new NotImplementedException("Password update not supported");
     }
 
+
     public List<Map<String, String>> findUsersPaged(Map<String, String> params, int firstResult, int maxResults) {
-        return getAllUsers().subList(firstResult, maxResults);
+        return doQuery(queryConfigurations.getListAll(), new Pageable(firstResult, maxResults), this::readMap);
     }
 }

@@ -19,8 +19,13 @@ Keycloak User Federation Screen Shot
 
     - Do not allow user information update, including password update
     - Do not supports user roles our groups
-    - Do not support paged queries
 
+## Custom attributes
+
+    - Just add a mapper to client mappers with the same name as the returned column alias in your queries. Use mapper type "User Attribute"
+    - See the example below
+    
+    [Sample Screenshot 2](screen2.png)
 
 
 ## Build

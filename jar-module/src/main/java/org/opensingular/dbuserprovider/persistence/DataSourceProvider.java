@@ -18,26 +18,27 @@ import java.util.concurrent.Executors;
 @JBossLog
 public class DataSourceProvider implements Closeable {
 
-    private             ExecutorService  executor           = Executors.newFixedThreadPool(1);
-    public              HikariDataSource hikariDataSource;
-    public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
+    private              ExecutorService  executor           = Executors.newFixedThreadPool(1);
+    private              HikariDataSource hikariDataSource;
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 
     public DataSourceProvider() {
     }
 
 
-    public synchronized Optional<DataSource> getDataSource() {
+    synchronized Optional<DataSource> getDataSource() {
         return Optional.ofNullable(hikariDataSource);
     }
 
 
-    public void configure(String url, String user, String pass) {
+    public void configure(String url, RDMS rdbms, String user, String pass) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setUsername(user);
         hikariConfig.setPassword(pass);
         hikariConfig.setPoolName(StringUtils.capitalize("SINGULAR-USER-PROVIDER-" + SIMPLE_DATE_FORMAT.format(new Date())));
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setConnectionTestQuery("select 1");
+        hikariConfig.setDriverClassName(rdbms.getDriver());
         HikariDataSource newDS = new HikariDataSource(hikariConfig);
         newDS.validate();
         HikariDataSource old = this.hikariDataSource;
@@ -46,22 +47,19 @@ public class DataSourceProvider implements Closeable {
     }
 
     private void disposeOldDataSource(HikariDataSource old) {
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (old != null) {
-                        old.close();
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+        executor.submit(() -> {
+            try {
+                if (old != null) {
+                    old.close();
                 }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         });
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         executor.shutdownNow();
         hikariDataSource.close();
     }
