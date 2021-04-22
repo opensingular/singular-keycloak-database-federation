@@ -22,9 +22,9 @@ Keycloak User Federation Screen Shot
 
 ## Custom attributes
 
-    Just add a mapper to client mappers with the same name as the returned column alias in your queries.Use mapper type "User Attribute". See the example below:
+Just add a mapper to client mappers with the same name as the returned column alias in your queries.Use mapper type "User Attribute". See the example below:
     
-    ![Sample Screenshot 2](screen2.png)
+![Sample Screenshot 2](screen2.png)
 
 
 ## Build
