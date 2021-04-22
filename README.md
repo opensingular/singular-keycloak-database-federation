@@ -29,7 +29,7 @@ Just add a mapper to client mappers with the same name as the returned column al
 
 ## Build
 
-    - mvn clean install
+    - mvn clean package
 
 ## Deployment
 
