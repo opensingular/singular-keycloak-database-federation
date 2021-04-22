@@ -3,30 +3,36 @@ package org.opensingular.dbuserprovider.model;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     private final String keycloakId;
+    private final String username;
 
     public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data) {
         super(session, realm, model);
         this.keycloakId = StorageId.keycloakId(model, data.get("id"));
+        this.username = data.get("username");
+        Map<String, List<String>> attributes = this.getAttributes();
         for (Entry<String, String> e : data.entrySet()) {
-            List<String> newValues = new ArrayList<>();
-            List<String> attribute = this.getAttribute(e.getKey());
+            Set<String>  newValues = new HashSet<>();
+            List<String> attribute = attributes.get(e.getKey());
             if (attribute != null) {
                 newValues.addAll(attribute);
             }
             newValues.add(e.getValue());
-            this.setAttribute(e.getKey(), newValues);
+            this.setAttribute(e.getKey(), newValues.stream().filter(Objects::nonNull).collect(Collectors.toList()));
         }
     }
 
@@ -38,7 +44,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public String getUsername() {
-        return getFirstAttribute(UserModel.USERNAME);
+        return username;
     }
 
     @Override
@@ -46,33 +52,5 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     }
 
-    @Override
-    public String getEmail() {
-        return getFirstAttribute(UserModel.EMAIL);
-    }
 
-    @Override
-    public void setEmail(String email) {
-
-    }
-
-    @Override
-    public String getFirstName() {
-        return getFirstAttribute(UserModel.FIRST_NAME);
-    }
-
-    @Override
-    public void setFirstName(String firstName) {
-
-    }
-
-    @Override
-    public String getLastName() {
-        return getFirstAttribute(UserModel.LAST_NAME);
-    }
-
-    @Override
-    public void setLastName(String lastName) {
-
-    }
 }
