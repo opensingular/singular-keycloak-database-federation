@@ -1,12 +1,12 @@
 package org.opensingular.dbuserprovider.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     private final String keycloakId;
-    private final String username;
+    private       String username;
 
     public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data) {
         super(session, realm, model);
@@ -31,7 +31,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
             if (attribute != null) {
                 newValues.addAll(attribute);
             }
-            newValues.add(e.getValue());
+            newValues.add(StringUtils.trimToNull(e.getValue()));
             this.setAttribute(e.getKey(), newValues.stream().filter(Objects::nonNull).collect(Collectors.toList()));
         }
     }
@@ -49,7 +49,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setUsername(String username) {
-
+        this.username = username;
     }
 
 

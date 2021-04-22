@@ -1,13 +1,13 @@
 package org.opensingular.dbuserprovider.persistence;
 
-import org.opensingular.dbuserprovider.DBUserStorageException;
-import org.opensingular.dbuserprovider.model.QueryConfigurations;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.mindrot.jbcrypt.BCrypt;
+import org.opensingular.dbuserprovider.DBUserStorageException;
+import org.opensingular.dbuserprovider.model.QueryConfigurations;
 
 import javax.sql.DataSource;
 import java.security.MessageDigest;
@@ -39,7 +39,12 @@ public class UserRepository {
         this.queryConfigurations = queryConfigurations;
     }
 
-    private <T> T doQuery(String query, Function<ResultSet, T> resultTransformer, Object... params) {
+    private class Pageable {
+        int first;
+        int max;
+    }
+
+    private <T> T doQuery(String query, Pageable pageable, Function<ResultSet, T> resultTransformer, Object... params) {
         Optional<DataSource> dataSourceOpt = dataSourceProvider.getDataSource();
         if (dataSourceOpt.isPresent()) {
             DataSource dataSource = dataSourceOpt.get();
@@ -49,6 +54,9 @@ public class UserRepository {
                     for (int i = 1; i <= params.length; i++) {
                         statement.setObject(i, params[i - 1]);
                     }
+                }
+                if (pageable != null) {
+                    //TODO suport pageable
                 }
                 try (ResultSet rs = statement.executeQuery()) {
                     return resultTransformer.apply(rs);
@@ -63,7 +71,7 @@ public class UserRepository {
 
     private List<Map<String, String>> readMap(ResultSet rs) {
         try {
-            List<Map<String, String>> data        = new ArrayList<>();
+            List<Map<String, String>> data         = new ArrayList<>();
             Set<String>               columnsFound = new HashSet<>();
             for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                 String columnLabel = rs.getMetaData().getColumnLabel(i);
@@ -110,33 +118,37 @@ public class UserRepository {
         }
     }
 
-    public List<Map<String,String>> getAllUsers() {
-        return doQuery(queryConfigurations.getListAll(), this::readMap);
+    public List<Map<String, String>> getAllUsers() {
+        return doQuery(queryConfigurations.getListAll(), null, this::readMap);
     }
 
     public int getUsersCount() {
-        return Optional.ofNullable(doQuery(queryConfigurations.getCount(), this::readInt)).orElse(0);
+        return Optional.ofNullable(doQuery(queryConfigurations.getCount(), null, this::readInt)).orElse(0);
     }
 
 
-    public Map<String,String> findUserById(String id) {
-        return Optional.ofNullable(doQuery(queryConfigurations.getFindById(), this::readMap, id))
+    public Map<String, String> findUserById(String id) {
+        return Optional.ofNullable(doQuery(queryConfigurations.getFindById(), null, this::readMap, id))
                 .orElse(Collections.emptyList())
                 .stream().findFirst().orElse(null);
     }
 
-    public Map<String,String> findUserByUsername(String username) {
-        return Optional.ofNullable(doQuery(queryConfigurations.getFindByUsername(), this::readMap, username))
+    public Optional<Map<String, String>> findUserByUsername(String username) {
+        return Optional.ofNullable(doQuery(queryConfigurations.getFindByUsername(), null, this::readMap, username))
                 .orElse(Collections.emptyList())
-                .stream().findFirst().orElse(null);
+                .stream().findFirst();
     }
 
-    public List<Map<String,String>> findUsers(String query) {
-        return doQuery(queryConfigurations.getFindBySearchTerm(), this::readMap, query);
+    public List<Map<String, String>> findUsers(String query) {
+        if (query.length() < 2) {
+            log.info("Ignoring query with less than two characters as search term");
+            return Collections.emptyList();
+        }
+        return doQuery(queryConfigurations.getFindBySearchTerm(), null, this::readMap, query);
     }
 
     public boolean validateCredentials(String username, String password) {
-        String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), this::readString, username)).orElse("");
+        String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
             return BCrypt.checkpw(password, hash);
         } else {
@@ -150,4 +162,7 @@ public class UserRepository {
         throw new NotImplementedException("Password update not supported");
     }
 
+    public List<Map<String, String>> findUsersPaged(Map<String, String> params, int firstResult, int maxResults) {
+        return getAllUsers().subList(firstResult, maxResults);
+    }
 }

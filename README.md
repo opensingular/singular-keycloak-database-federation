@@ -15,6 +15,13 @@ Keycloak User Federation Screen Shot
 [Sample Screenshot](screen.png)
 
 
+## Limitations
+
+    - Do not allow user information update, including password update
+    - Do not supports user roles our groups
+    - Do not support paged queries
+
+
 
 ## Build
 
