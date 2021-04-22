@@ -12,7 +12,7 @@ Keycloak User Storage SPI for Relational Databases (Keycloak User Federation, su
 
 Keycloak User Federation Screen Shot
 
-[Sample Screenshot](screen.png)
+![Sample Screenshot](screen.png)
 
 
 ## Limitations
