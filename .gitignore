@@ -1,3 +1,4 @@
 keycloak
 **/target
 .DS_Store
+.idea
