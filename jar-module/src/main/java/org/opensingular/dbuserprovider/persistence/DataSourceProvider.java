@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -31,7 +30,7 @@ public class DataSourceProvider implements Closeable {
     }
 
 
-    public void configure(String url, RDMS rdbms, String user, String pass) {
+    public void configure(String url, RDBMS rdbms, String user, String pass) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setUsername(user);
         hikariConfig.setPassword(pass);

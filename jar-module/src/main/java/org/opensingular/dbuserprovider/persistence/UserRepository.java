@@ -48,7 +48,7 @@ public class UserRepository {
             DataSource dataSource = dataSourceOpt.get();
             try (Connection c = dataSource.getConnection()) {
                 if (pageable != null) {
-                    query = PagingUtil.formatScriptWithPageable(query, pageable, queryConfigurations.getRdms());
+                    query = PagingUtil.formatScriptWithPageable(query, pageable, queryConfigurations.getRDBMS());
                 }
                 PreparedStatement statement = c.prepareStatement(query);
                 if (params != null) {

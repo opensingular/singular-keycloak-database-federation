@@ -4,7 +4,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.pagination.LimitHandler;
 import org.hibernate.engine.spi.RowSelection;
 import org.opensingular.dbuserprovider.DBUserStorageException;
-import org.opensingular.dbuserprovider.persistence.RDMS;
+import org.opensingular.dbuserprovider.persistence.RDBMS;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -27,9 +27,9 @@ public class PagingUtil {
         }
     }
 
-    public static String formatScriptWithPageable(String query, Pageable pageable, RDMS rdms) {
+    public static String formatScriptWithPageable(String query, Pageable pageable, RDBMS RDBMS) {
 
-        final Dialect dialect = rdms.getDialect();
+        final Dialect dialect = RDBMS.getDialect();
 
         RowSelection rowSelection = new RowSelection();
         rowSelection.setFetchSize(pageable.maxResults);

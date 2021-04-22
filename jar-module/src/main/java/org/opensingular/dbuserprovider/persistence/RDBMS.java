@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public enum RDMS {
+public enum RDBMS {
 
     POSTGRESQL("PostgreSQL 10+", org.postgresql.Driver.class.getName(), "SELECT 1", new PostgreSQL10Dialect()),
     MYSQL("MySQL 5.7+", com.mysql.cj.jdbc.Driver.class.getName(), "SELECT 1", new MySQL57Dialect()),
@@ -23,15 +23,15 @@ public enum RDMS {
     private final String  testString;
     private final Dialect dialect;
 
-    RDMS(String desc, String driver, String testString, Dialect dialect) {
+    RDBMS(String desc, String driver, String testString, Dialect dialect) {
         this.desc = desc;
         this.driver = driver;
         this.testString = testString;
         this.dialect = dialect;
     }
 
-    public static RDMS getByDescription(String desc) {
-        for (RDMS value : values()) {
+    public static RDBMS getByDescription(String desc) {
+        for (RDBMS value : values()) {
             if (value.desc.equals(desc)) {
                 return value;
             }
@@ -44,7 +44,7 @@ public enum RDMS {
     }
 
     public static List<String> getAllDescriptions() {
-        return Arrays.stream(values()).map(RDMS::getDesc).collect(Collectors.toList());
+        return Arrays.stream(values()).map(RDBMS::getDesc).collect(Collectors.toList());
     }
 
     public String getDesc() {

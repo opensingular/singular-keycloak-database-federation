@@ -12,7 +12,7 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
 import org.opensingular.dbuserprovider.model.QueryConfigurations;
 import org.opensingular.dbuserprovider.persistence.DataSourceProvider;
-import org.opensingular.dbuserprovider.persistence.RDMS;
+import org.opensingular.dbuserprovider.persistence.RDBMS;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
         String user     = config.get("user");
         String password = config.get("password");
         String url      = config.get("url");
-        RDMS   rdbms    = RDMS.getByDescription(config.get("rdbms"));
+        RDBMS  rdbms    = RDBMS.getByDescription(config.get("rdbms"));
         dataSourceProvider.configure(url, rdbms, user, password);
         queryConfigurations = new QueryConfigurations(
                 config.get("count"),
@@ -108,8 +108,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 .label("RDBMS")
                 .helpText("Relational Database Management System")
                 .type(ProviderConfigProperty.LIST_TYPE)
-                .options(RDMS.getAllDescriptions())
-                .defaultValue(RDMS.SQL_SERVER.getDesc())
+                .options(RDBMS.getAllDescriptions())
+                .defaultValue(RDBMS.SQL_SERVER.getDesc())
                 .add()
 
                 //QUERIES

@@ -1,6 +1,6 @@
 package org.opensingular.dbuserprovider.model;
 
-import org.opensingular.dbuserprovider.persistence.RDMS;
+import org.opensingular.dbuserprovider.persistence.RDBMS;
 
 public class QueryConfigurations {
 
@@ -11,9 +11,9 @@ public class QueryConfigurations {
     private String findBySearchTerm;
     private String findPasswordHash;
     private String hashFunction;
-    private RDMS   rdms;
+    private RDBMS  RDBMS;
 
-    public QueryConfigurations(String count, String listAll, String findById, String findByUsername, String findBySearchTerm, String findPasswordHash, String hashFunction, RDMS rdms) {
+    public QueryConfigurations(String count, String listAll, String findById, String findByUsername, String findBySearchTerm, String findPasswordHash, String hashFunction, RDBMS RDBMS) {
         this.count = count;
         this.listAll = listAll;
         this.findById = findById;
@@ -21,11 +21,11 @@ public class QueryConfigurations {
         this.findBySearchTerm = findBySearchTerm;
         this.findPasswordHash = findPasswordHash;
         this.hashFunction = hashFunction;
-        this.rdms = rdms;
+        this.RDBMS = RDBMS;
     }
 
-    public RDMS getRdms() {
-        return rdms;
+    public RDBMS getRDBMS() {
+        return RDBMS;
     }
 
     public String getCount() {
