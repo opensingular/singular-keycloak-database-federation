@@ -2,6 +2,16 @@
 
 Keycloak User Storage SPI for Relational Databases (Keycloak User Federation, supports postgresql, mysql, oracle and mysql).
 
+- Keycloak User federation provider with SQL
+- Keycloak User federation using existing database
+- Keycloak  database user provider
+- Keycloak MSSQL Database Integration 
+- Keycloak SQL Server Database Integration 
+- Keycloak Oracle Database Integration 
+- Keycloak Postgres Database Integration 
+- Keycloak blowfish bcrypt support
+
+
 
 ## Usage
 
