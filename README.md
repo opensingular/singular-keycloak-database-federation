@@ -44,4 +44,5 @@ Just add a mapper to client mappers with the same name as the returned column al
 ## Deployment
 
     - Deploy `.ear` to wildfly (keycloak)
+        - i.e, on a default keycloak setup, copy the `.ear` file to <keycloak_root_dir>/standalone/deployments
 
