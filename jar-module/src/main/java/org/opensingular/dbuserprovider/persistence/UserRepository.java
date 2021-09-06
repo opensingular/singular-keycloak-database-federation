@@ -152,7 +152,7 @@ public class UserRepository {
         } else {
             MessageDigest digest   = DigestUtils.getDigest(queryConfigurations.getHashFunction());
             byte[]        pwdBytes = StringUtils.getBytesUtf8(password);
-            return Objects.equals(Hex.encodeHexString(digest.digest(pwdBytes)), password);
+            return Objects.equals(Hex.encodeHexString(digest.digest(pwdBytes)), hash);
         }
     }
 
