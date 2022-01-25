@@ -138,7 +138,7 @@ public class UserRepository {
     }
 
     public List<Map<String, String>> findUsers(String query) {
-        if (query.length() < 2) {
+        if (query == null || query.length() < 2) {
             log.info("Ignoring query with less than two characters as search term");
             return Collections.emptyList();
         }
