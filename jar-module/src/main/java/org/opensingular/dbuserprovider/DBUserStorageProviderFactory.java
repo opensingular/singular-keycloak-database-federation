@@ -23,9 +23,9 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
     private static final String PARAMETER_PLACEHOLDER_HELP = "Use '?' as parameter placeholder character (replaced only once). ";
     private static final String DEFAULT_HELP_TEXT          = "Select to query all users you must return at least: \"id\". " +
             "            \"username\"," +
-            "            \"email\" (opcional)," +
-            "            \"firstName\" (opcional)," +
-            "            \"lastName\" (opcional). Any other parameter can be mapped by aliases to a realm scope";
+            "            \"email\" (optional)," +
+            "            \"firstName\" (optional)," +
+            "            \"lastName\" (optional). Any other parameter can be mapped by aliases to a realm scope";
     private static final String PARAMETER_HELP             = " The %s is passed as query parameter.";
 
 
