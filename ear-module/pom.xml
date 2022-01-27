@@ -5,7 +5,7 @@
     <parent>
         <artifactId>singular-user-storage-provider</artifactId>
         <groupId>org.opensingular</groupId>
-        <version>1.2</version>
+        <version>1.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,14 +25,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <includeLibInApplicationXml>true</includeLibInApplicationXml>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
+                <version>2.0.2.Final</version>
                 <configuration>
                     <skip>false</skip>
                 </configuration>
