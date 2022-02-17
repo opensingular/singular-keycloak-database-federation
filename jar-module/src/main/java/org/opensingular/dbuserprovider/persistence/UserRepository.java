@@ -91,8 +91,7 @@ public class UserRepository {
 
     private Integer readInt(ResultSet rs) {
         try {
-            rs.next();
-            return rs.getInt(1);
+            return rs.next() ? rs.getInt(1) : null;
         } catch (Exception e) {
             throw new DBUserStorageException(e.getMessage(), e);
         }
@@ -100,8 +99,7 @@ public class UserRepository {
 
     private Boolean readBoolean(ResultSet rs) {
         try {
-            rs.next();
-            return rs.getBoolean(1);
+            return rs.next() ? rs.getBoolean(1) : null;
         } catch (Exception e) {
             throw new DBUserStorageException(e.getMessage(), e);
         }
@@ -109,8 +107,7 @@ public class UserRepository {
 
     private String readString(ResultSet rs) {
         try {
-            rs.next();
-            return rs.getString(1);
+            return rs.next() ? rs.getString(1) : null;
         } catch (Exception e) {
             throw new DBUserStorageException(e.getMessage(), e);
         }
@@ -148,7 +145,7 @@ public class UserRepository {
     public boolean validateCredentials(String username, String password) {
         String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
-            return BCrypt.checkpw(password, hash);
+            return !hash.isEmpty() && BCrypt.checkpw(password, hash);
         } else {
             MessageDigest digest   = DigestUtils.getDigest(queryConfigurations.getHashFunction());
             byte[]        pwdBytes = StringUtils.getBytesUtf8(password);
