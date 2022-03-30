@@ -1,0 +1,93 @@
+* text eol=lf
+* text=auto
+**/*.h2.db
+**/*.iml
+**/*.mv.db
+**/*.tmp
+**/*.trace.db
+**/*.ucls
+**/.externalToolBuilders/
+**/overlays/
+**/rebel.xml
+**/singulardb.lock.db
+**/target/
+*.bak
+*.bat text eol=crlf
+*.crt binary
+*.css text
+*.dll binary
+*.doc binary
+*.docx binary
+*.dylib binary
+*.eot binary
+*.exe binary
+*.gif binary
+*.html text
+*.jar binary
+*.java text
+*.jpg binary
+*.js text
+*.otf binary
+*.pdf binary
+*.png binary
+*.properties text
+*.sh text
+*.so binary
+*.so.0 binary
+*.so.0.0.0 binary
+*.so.0.1 binary
+*.so.0.1.0 binary
+*.so.0.12.4 binary
+*.so.1 binary
+*.so.1.0.0 binary
+*.so.1.1.0 binary
+*.so.1.2.7 binary
+*.so.1.3.0 binary
+*.so.1.7.0 binary
+*.so.12 binary
+*.so.6 binary
+*.so.6.0.0 binary
+*.so.6.10.0 binary
+*.so.6.3.0 binary
+*.so.6.4.0 binary
+*.svg binary
+*.swp
+*.tmp
+*.truststore binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.xml text
+*.zip binary
+*~.nib
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+._*
+.classpath
+.idea/
+.loadpath
+.metadata
+.project
+.settings/
+Thumbs.db
+_confHomol/
+atlassian-ide-plugin.xml
+bin/**
+buildall.sh
+classes/
+ehthumbs.db
+flow/test/singulardb.trace.db.old
+local.properties
+out/**
+pom.xml.next
+pom.xml.releaseBackup
+pom.xml.tag
+pom.xml.versionsBackup
+release.properties
+resources/ui-static-resources/src/main/webapp/resources/comum/* linguist-vendored
+tmp/**
+tmp/**/*
+wkhtmltoimage binary
+wkhtmltopdf binary

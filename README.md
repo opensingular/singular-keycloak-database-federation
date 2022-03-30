@@ -1,5 +1,10 @@
 # singular-keycloak-database-federation
 
+
+### Compatible with Keycloak 17+ quarkus based.
+**For older versions look at older_versions branch.
+
+
 Keycloak User Storage SPI for Relational Databases (Keycloak User Federation, supports postgresql, mysql, oracle and mysql).
 
 - Keycloak User federation provider with SQL
@@ -43,6 +48,17 @@ Just add a mapper to client mappers with the same name as the returned column al
 
 ## Deployment
 
-    - Deploy `.ear` to wildfly (keycloak)
-        - i.e, on a default keycloak setup, copy the `.ear` file to <keycloak_root_dir>/standalone/deployments
+    1) Copy every  `.jar` from dist/ folder  to  /providers folder under your keycloak installation root. 
+        - i.e, on a default keycloak setup, copy all  `.jar` files to <keycloak_root_dir>/providers
+    2) run :
+        $ ./bin/kc.sh start-dev
+    OR if you ara using a production configuration:
+        $ ./bin/kc.sh build
+        $ ./bin/kc.sh start
+
+## For futher information see:
+    - https://github.com/keycloak/keycloak/issues/9833
+    - https://www.keycloak.org/docs/latest/server_development/#packaging-and-deployment
+    
+    
 
