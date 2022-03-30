@@ -52,7 +52,7 @@ Just add a mapper to client mappers with the same name as the returned column al
         - i.e, on a default keycloak setup, copy all  `.jar` files to <keycloak_root_dir>/providers
     2) run :
         $ ./bin/kc.sh start-dev
-    OR if you ara using a production configuration:
+    OR if you are using a production configuration:
         $ ./bin/kc.sh build
         $ ./bin/kc.sh start
 
