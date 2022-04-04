@@ -16,6 +16,7 @@ import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
+import org.keycloak.storage.user.UserRegistrationProvider;
 import org.opensingular.dbuserprovider.model.QueryConfigurations;
 import org.opensingular.dbuserprovider.model.UserAdapter;
 import org.opensingular.dbuserprovider.persistence.DataSourceProvider;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 @JBossLog
 public class DBUserStorageProvider implements UserStorageProvider,
-        UserLookupProvider, UserQueryProvider, CredentialInputUpdater, CredentialInputValidator {
+        UserLookupProvider, UserQueryProvider, CredentialInputUpdater, CredentialInputValidator, UserRegistrationProvider {
 
     private final KeycloakSession session;
     private final ComponentModel  model;
@@ -216,5 +217,21 @@ public class DBUserStorageProvider implements UserStorageProvider,
         log.infov("search for group members: realm={0} attrName={1} attrValue={2}", realm.getId(), attrName, attrValue);
 
         return Collections.emptyList();
+    }
+
+
+    @Override
+    public UserModel addUser(RealmModel realm, String username) {
+        // from documentation: "If your provider has a configuration switch to turn off adding a user, returning null from this method will skip the provider and call the next one."
+        return null;
+    }
+
+
+    @Override
+    public boolean removeUser(RealmModel realm, UserModel user) {
+
+        log.infov("unlink user: realm={0} userId={1} username={2}", realm.getId(), user.getId(), user.getUsername());
+
+        return true;
     }
 }
