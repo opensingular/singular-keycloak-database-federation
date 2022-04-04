@@ -161,4 +161,8 @@ public class UserRepository {
     public List<Map<String, String>> findUsersPaged(Map<String, String> params, int firstResult, int maxResults) {
         return doQuery(queryConfigurations.getListAll(), new Pageable(firstResult, maxResults), this::readMap);
     }
+
+    public boolean removeUser() {
+      return queryConfigurations.getAllowKeycloakDelete();
+  }
 }
