@@ -38,6 +38,11 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
     }
 
     @Override
+    public void close() {
+      dataSourceProvider.close();
+    }
+
+    @Override
     public DBUserStorageProvider create(KeycloakSession session, ComponentModel model) {
         if (!configured) {
             configure(model);
