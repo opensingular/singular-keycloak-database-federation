@@ -29,6 +29,10 @@ Keycloak User Federation Screen Shot
 
 ![Sample Screenshot](screen.png)
 
+There is a new configuration that allows keycloak to remove a user entry from its local database (this option has no effect on the source database). It can be useful when you need to reload user data.
+This option can be configured by the following switch:
+
+![Sample Screenshot](deleteuser.png)
 
 ## Limitations
 
