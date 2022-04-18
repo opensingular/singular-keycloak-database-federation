@@ -127,6 +127,7 @@
 
 
     <build>
+        <finalName>singular-user-storage-provider</finalName>
         <plugins>
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
