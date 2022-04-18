@@ -229,9 +229,12 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
     @Override
     public boolean removeUser(RealmModel realm, UserModel user) {
+        boolean userRemoved = repository.removeUser();
 
-        log.infov("unlink user: realm={0} userId={1} username={2}", realm.getId(), user.getId(), user.getUsername());
+        if (userRemoved) {
+          log.infov("deleted keycloak user: realm={0} userId={1} username={2}", realm.getId(), user.getId(), user.getUsername());
+        }
 
-        return true;
+        return userRemoved;
     }
 }

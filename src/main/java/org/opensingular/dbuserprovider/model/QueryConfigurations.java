@@ -12,8 +12,9 @@ public class QueryConfigurations {
     private String findPasswordHash;
     private String hashFunction;
     private RDBMS  RDBMS;
+    private boolean allowKeycloakDelete;
 
-    public QueryConfigurations(String count, String listAll, String findById, String findByUsername, String findBySearchTerm, String findPasswordHash, String hashFunction, RDBMS RDBMS) {
+    public QueryConfigurations(String count, String listAll, String findById, String findByUsername, String findBySearchTerm, String findPasswordHash, String hashFunction, RDBMS RDBMS, boolean allowKeycloakDelete) {
         this.count = count;
         this.listAll = listAll;
         this.findById = findById;
@@ -22,6 +23,7 @@ public class QueryConfigurations {
         this.findPasswordHash = findPasswordHash;
         this.hashFunction = hashFunction;
         this.RDBMS = RDBMS;
+        this.allowKeycloakDelete = allowKeycloakDelete;
     }
 
     public RDBMS getRDBMS() {
@@ -58,5 +60,9 @@ public class QueryConfigurations {
 
     public boolean isBlowfish() {
         return hashFunction.toLowerCase().contains("blowfish");
+    }
+
+    public boolean getAllowKeycloakDelete() {
+        return allowKeycloakDelete;
     }
 }

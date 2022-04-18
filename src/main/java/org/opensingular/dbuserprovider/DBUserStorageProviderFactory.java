@@ -59,7 +59,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 config.get("findBySearchTerm"),
                 config.get("findPasswordHash"),
                 config.get("hashFunction"),
-                rdbms
+                rdbms,
+                config.get("allowKeycloakDelete", false)
         );
         configured = true;
     }
@@ -110,6 +111,13 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 .type(ProviderConfigProperty.LIST_TYPE)
                 .options(RDBMS.getAllDescriptions())
                 .defaultValue(RDBMS.SQL_SERVER.getDesc())
+                .add()
+                .property()
+                .name("allowKeycloakDelete")
+                .label("Allow Keycloak's User Delete")
+                .helpText("By default, clicking Delete on a user in Keycloak is not allowed.  Activate this option to allow to Delete Keycloak's version of the user (does not touch the user record in the linked RDBMS), e.g. to clear synching issues and allow the user to be synced from scratch from the RDBMS on next use, in Production or for testing.")
+                .type(ProviderConfigProperty.BOOLEAN_TYPE)
+                .defaultValue("false")
                 .add()
 
                 //QUERIES
