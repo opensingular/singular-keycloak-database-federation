@@ -65,7 +65,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 config.get("findPasswordHash"),
                 config.get("hashFunction"),
                 rdbms,
-                config.get("allowKeycloakDelete", false)
+                config.get("allowKeycloakDelete", false),
+                config.get("allowDatabaseToOverwriteKeycloak", false)
         );
         configured = true;
     }
@@ -121,6 +122,14 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 .name("allowKeycloakDelete")
                 .label("Allow Keycloak's User Delete")
                 .helpText("By default, clicking Delete on a user in Keycloak is not allowed.  Activate this option to allow to Delete Keycloak's version of the user (does not touch the user record in the linked RDBMS), e.g. to clear synching issues and allow the user to be synced from scratch from the RDBMS on next use, in Production or for testing.")
+                .type(ProviderConfigProperty.BOOLEAN_TYPE)
+                .defaultValue("false")
+                .add()
+                .property()
+                .name("allowDatabaseToOverwriteKeycloak")
+                .label("Allow DB Attributes to Overwrite Keycloak")
+                // Technically details for the following comment: we aggregate both the existing Keycloak version and the DB version of an attribute in a Set, but since e.g. email is not a list of values on the Keycloak User, the new email is never set on it.
+                .helpText("By default, once a user is loaded in Keycloak, its attributes (e.g. 'email') stay as they are in Keycloak even if an attribute of the same name now returns a different value through the query.  Activate this option to have all attributes set in the SQL query to always overwrite the existing user attributes in Keycloak (e.g. if Keycloak user has email 'test@test.com' but the query fetches a field named 'email' that has a value 'example@exemple.com', the Keycloak user will now have email attribute = 'example@exemple.com').")
                 .type(ProviderConfigProperty.BOOLEAN_TYPE)
                 .defaultValue("false")
                 .add()

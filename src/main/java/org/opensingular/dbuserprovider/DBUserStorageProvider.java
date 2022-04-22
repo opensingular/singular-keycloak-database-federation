@@ -35,17 +35,19 @@ public class DBUserStorageProvider implements UserStorageProvider,
     private final KeycloakSession session;
     private final ComponentModel  model;
     private final UserRepository  repository;
+    private final boolean allowDatabaseToOverwriteKeycloak;
 
     DBUserStorageProvider(KeycloakSession session, ComponentModel model, DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
         this.session = session;
         this.model = model;
         this.repository = new UserRepository(dataSourceProvider, queryConfigurations);
+        this.allowDatabaseToOverwriteKeycloak = queryConfigurations.getAllowDatabaseToOverwriteKeycloak();
     }
 
 
     private List<UserModel> toUserModel(RealmModel realm, List<Map<String, String>> users) {
         return users.stream()
-                .map(m -> new UserAdapter(session, realm, model, m)).collect(Collectors.toList());
+                .map(m -> new UserAdapter(session, realm, model, m, allowDatabaseToOverwriteKeycloak)).collect(Collectors.toList());
     }
 
 
@@ -123,7 +125,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
         log.infov("lookup user by id: realm={0} userId={1}", realm.getId(), id);
 
         String externalId = StorageId.externalId(id);
-        return new UserAdapter(session, realm, model, repository.findUserById(externalId));
+        return new UserAdapter(session, realm, model, repository.findUserById(externalId), allowDatabaseToOverwriteKeycloak);
     }
 
     @Override
@@ -131,7 +133,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
 
         log.infov("lookup user by username: realm={0} username={1}", realm.getId(), username);
 
-        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u)).orElse(null);
+        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
     }
 
     @Override
