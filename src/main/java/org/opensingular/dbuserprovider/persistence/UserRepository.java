@@ -17,31 +17,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 
 @JBossLog
 public class UserRepository {
-
-
+    
+    
     private DataSourceProvider  dataSourceProvider;
     private QueryConfigurations queryConfigurations;
-
+    
     public UserRepository(DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
-        this.dataSourceProvider = dataSourceProvider;
+        this.dataSourceProvider  = dataSourceProvider;
         this.queryConfigurations = queryConfigurations;
     }
-
-
+    
+    
     private <T> T doQuery(String query, Pageable pageable, Function<ResultSet, T> resultTransformer, Object... params) {
         Optional<DataSource> dataSourceOpt = dataSourceProvider.getDataSource();
         if (dataSourceOpt.isPresent()) {
@@ -50,14 +42,16 @@ public class UserRepository {
                 if (pageable != null) {
                     query = PagingUtil.formatScriptWithPageable(query, pageable, queryConfigurations.getRDBMS());
                 }
-                PreparedStatement statement = c.prepareStatement(query);
-                if (params != null) {
-                    for (int i = 1; i <= params.length; i++) {
-                        statement.setObject(i, params[i - 1]);
+                log.infov("Query: {0} params: {1} ", query, Arrays.toString(params));
+                try (PreparedStatement statement = c.prepareStatement(query)) {
+                    if (params != null) {
+                        for (int i = 1; i <= params.length; i++) {
+                            statement.setObject(i, params[i - 1]);
+                        }
                     }
-                }
-                try (ResultSet rs = statement.executeQuery()) {
-                    return resultTransformer.apply(rs);
+                    try (ResultSet rs = statement.executeQuery()) {
+                        return resultTransformer.apply(rs);
+                    }
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
@@ -66,7 +60,7 @@ public class UserRepository {
         }
         return null;
     }
-
+    
     private List<Map<String, String>> readMap(ResultSet rs) {
         try {
             List<Map<String, String>> data         = new ArrayList<>();
@@ -87,8 +81,8 @@ public class UserRepository {
             throw new DBUserStorageException(e.getMessage(), e);
         }
     }
-
-
+    
+    
     private Integer readInt(ResultSet rs) {
         try {
             return rs.next() ? rs.getInt(1) : null;
@@ -96,7 +90,7 @@ public class UserRepository {
             throw new DBUserStorageException(e.getMessage(), e);
         }
     }
-
+    
     private Boolean readBoolean(ResultSet rs) {
         try {
             return rs.next() ? rs.getBoolean(1) : null;
@@ -104,7 +98,7 @@ public class UserRepository {
             throw new DBUserStorageException(e.getMessage(), e);
         }
     }
-
+    
     private String readString(ResultSet rs) {
         try {
             return rs.next() ? rs.getString(1) : null;
@@ -112,36 +106,40 @@ public class UserRepository {
             throw new DBUserStorageException(e.getMessage(), e);
         }
     }
-
+    
     public List<Map<String, String>> getAllUsers() {
         return doQuery(queryConfigurations.getListAll(), null, this::readMap);
     }
-
-    public int getUsersCount() {
-        return Optional.ofNullable(doQuery(queryConfigurations.getCount(), null, this::readInt)).orElse(0);
+    
+    public int getUsersCount(String search) {
+        if (search == null || search.isEmpty()) {
+            return Optional.ofNullable(doQuery(queryConfigurations.getCount(), null, this::readInt)).orElse(0);
+        } else {
+            String query = String.format("select count(*) from (%s) count", queryConfigurations.getFindBySearchTerm());
+            return Optional.ofNullable(doQuery(query, null, this::readInt, search)).orElse(0);
+        }
     }
-
-
+    
+    
     public Map<String, String> findUserById(String id) {
         return Optional.ofNullable(doQuery(queryConfigurations.getFindById(), null, this::readMap, id))
-                .orElse(Collections.emptyList())
-                .stream().findFirst().orElse(null);
+                       .orElse(Collections.emptyList())
+                       .stream().findFirst().orElse(null);
     }
-
+    
     public Optional<Map<String, String>> findUserByUsername(String username) {
         return Optional.ofNullable(doQuery(queryConfigurations.getFindByUsername(), null, this::readMap, username))
-                .orElse(Collections.emptyList())
-                .stream().findFirst();
+                       .orElse(Collections.emptyList())
+                       .stream().findFirst();
     }
-
-    public List<Map<String, String>> findUsers(String query) {
-        if (query == null || query.length() < 2) {
-            log.info("Ignoring query with less than two characters as search term");
-            return Collections.emptyList();
+    
+    public List<Map<String, String>> findUsers(String search, PagingUtil.Pageable pageable) {
+        if (search == null || search.isEmpty()) {
+            return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
         }
-        return doQuery(queryConfigurations.getFindBySearchTerm(), null, this::readMap, query);
+        return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, search);
     }
-
+    
     public boolean validateCredentials(String username, String password) {
         String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
@@ -152,17 +150,12 @@ public class UserRepository {
             return Objects.equals(Hex.encodeHexString(digest.digest(pwdBytes)), hash);
         }
     }
-
+    
     public boolean updateCredentials(String username, String password) {
         throw new NotImplementedException("Password update not supported");
     }
-
-
-    public List<Map<String, String>> findUsersPaged(Map<String, String> params, int firstResult, int maxResults) {
-        return doQuery(queryConfigurations.getListAll(), new Pageable(firstResult, maxResults), this::readMap);
-    }
-
+    
     public boolean removeUser() {
-      return queryConfigurations.getAllowKeycloakDelete();
-  }
+        return queryConfigurations.getAllowKeycloakDelete();
+    }
 }
