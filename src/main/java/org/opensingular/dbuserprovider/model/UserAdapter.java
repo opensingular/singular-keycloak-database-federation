@@ -22,7 +22,7 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     private final String keycloakId;
     private       String username;
 
-    public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data) {
+    public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data, boolean allowDatabaseToOverwriteKeycloak) {
         super(session, realm, model);
         this.keycloakId = StorageId.keycloakId(model, data.get("id"));
         this.username = data.get("username");
@@ -30,9 +30,11 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
           Map<String, List<String>> attributes = this.getAttributes();
           for (Entry<String, String> e : data.entrySet()) {
               Set<String>  newValues = new HashSet<>();
-              List<String> attribute = attributes.get(e.getKey());
-              if (attribute != null) {
-                  newValues.addAll(attribute);
+              if (!allowDatabaseToOverwriteKeycloak) {
+                List<String> attribute = attributes.get(e.getKey());
+                if (attribute != null) {
+                    newValues.addAll(attribute);
+                }
               }
               newValues.add(StringUtils.trimToNull(e.getValue()));
               this.setAttribute(e.getKey(), newValues.stream().filter(Objects::nonNull).collect(Collectors.toList()));

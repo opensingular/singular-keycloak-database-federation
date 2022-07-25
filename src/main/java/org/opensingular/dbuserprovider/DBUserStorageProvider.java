@@ -5,6 +5,7 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
+import org.keycloak.models.cache.CachedUserModel;
 import org.keycloak.models.*;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.StorageId;
@@ -31,17 +32,19 @@ public class DBUserStorageProvider implements UserStorageProvider,
     private final KeycloakSession session;
     private final ComponentModel  model;
     private final UserRepository  repository;
-    
+    private final boolean allowDatabaseToOverwriteKeycloak;
+
     DBUserStorageProvider(KeycloakSession session, ComponentModel model, DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
         this.session    = session;
         this.model      = model;
         this.repository = new UserRepository(dataSourceProvider, queryConfigurations);
+        this.allowDatabaseToOverwriteKeycloak = queryConfigurations.getAllowDatabaseToOverwriteKeycloak();
     }
     
     
     private List<UserModel> toUserModel(RealmModel realm, List<Map<String, String>> users) {
         return users.stream()
-                    .map(m -> new UserAdapter(session, realm, model, m)).collect(Collectors.toList());
+                    .map(m -> new UserAdapter(session, realm, model, m, allowDatabaseToOverwriteKeycloak)).collect(Collectors.toList());
     }
     
     
@@ -65,7 +68,18 @@ public class DBUserStorageProvider implements UserStorageProvider,
         }
         
         UserCredentialModel cred = (UserCredentialModel) input;
-        return repository.validateCredentials(user.getUsername(), cred.getChallengeResponse());
+
+        UserModel dbUser = user;
+        // If the cache just got loaded in the last 500 millisec (i.e. probably part of the actual flow), there is no point in reloading the user.)
+        if (allowDatabaseToOverwriteKeycloak && user instanceof CachedUserModel && (System.currentTimeMillis() - ((CachedUserModel) user).getCacheTimestamp()) > 500) {
+          dbUser = this.getUserById(user.getId(), realm);
+
+          // For now, we'll just invalidate the cache if username or email has changed. Eventually we could check all (or a parametered list of) attributes fetched from the DB.
+          if (!java.util.Objects.equals(user.getUsername(), dbUser.getUsername()) || !java.util.Objects.equals(user.getEmail(), dbUser.getEmail())) {
+            ((CachedUserModel) user).invalidate();
+          }
+        }
+        return repository.validateCredentials(dbUser.getUsername(), cred.getChallengeResponse());
     }
     
     @Override
@@ -119,7 +133,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
         log.infov("lookup user by id: realm={0} userId={1}", realm.getId(), id);
         
         String externalId = StorageId.externalId(id);
-        return new UserAdapter(session, realm, model, repository.findUserById(externalId));
+        return new UserAdapter(session, realm, model, repository.findUserById(externalId), allowDatabaseToOverwriteKeycloak);
     }
     
     @Override
@@ -127,7 +141,7 @@ public class DBUserStorageProvider implements UserStorageProvider,
         
         log.infov("lookup user by username: realm={0} username={1}", realm.getId(), username);
         
-        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u)).orElse(null);
+        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
     }
     
     @Override
