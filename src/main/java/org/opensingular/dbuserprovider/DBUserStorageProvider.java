@@ -74,6 +74,11 @@ public class DBUserStorageProvider implements UserStorageProvider,
         if (allowDatabaseToOverwriteKeycloak && user instanceof CachedUserModel && (System.currentTimeMillis() - ((CachedUserModel) user).getCacheTimestamp()) > 500) {
           dbUser = this.getUserById(user.getId(), realm);
 
+          if (dbUser == null) {
+            ((CachedUserModel) user).invalidate();
+            return false;
+          }
+
           // For now, we'll just invalidate the cache if username or email has changed. Eventually we could check all (or a parametered list of) attributes fetched from the DB.
           if (!java.util.Objects.equals(user.getUsername(), dbUser.getUsername()) || !java.util.Objects.equals(user.getEmail(), dbUser.getEmail())) {
             ((CachedUserModel) user).invalidate();
@@ -133,7 +138,14 @@ public class DBUserStorageProvider implements UserStorageProvider,
         log.infov("lookup user by id: realm={0} userId={1}", realm.getId(), id);
         
         String externalId = StorageId.externalId(id);
-        return new UserAdapter(session, realm, model, repository.findUserById(externalId), allowDatabaseToOverwriteKeycloak);
+        Map<String, String> user = repository.findUserById(externalId);
+
+        if (user == null) {
+            log.debugv("findUserById returned null, skipping creation of UserAdapter, expect login error");
+            return null;
+        } else {
+            return new UserAdapter(session, realm, model, user, allowDatabaseToOverwriteKeycloak);
+        }
     }
     
     @Override
