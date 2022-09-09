@@ -217,8 +217,8 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                                            .label("Password hash function")
                                            .helpText("Hash type used to match passwrod (md* e sha* uses hex hash digest)")
                                            .type(ProviderConfigProperty.LIST_TYPE)
-                                           .options("Blowfish (bcrypt)", "MD2", "MD5", "SHA-1", "SHA-256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA-512")
-                                           .defaultValue("SHA-1")
+                                           .options("Blowfish (bcrypt)", "MD2", "MD5", "SHA-1", "SHA-256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA-512", "PBKDF2-SHA256")
+                                           .defaultValue("PBKDF2-SHA256")
                                            .add()
                                            .build();
     }
