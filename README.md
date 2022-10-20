@@ -1,7 +1,24 @@
 # singular-keycloak-database-federation
 
 
+
 ### Compatible with Keycloak 17+ quarkus based.
+
+### ** Keycloak 19+ ** KNOWN ISSUE:
+
+#### New Theme breaks custom providers, to overcome this problem, follow these steps:
+
+
+ - Click "Realm Settings" on the left menu
+ - Then click the tab "Themes"
+ - And, for the selection input labeled "Admin console theme", select "keycloak"
+ - Logoff and login again
+ - Now, if you try to configure this provider again, keycloak should render all configuration fields and everything else should work fine.
+ 
+ See issue #19 for further information.
+
+
+
 **For older versions look at older_versions branch.
 
 
