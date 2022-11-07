@@ -1,6 +1,24 @@
 package org.opensingular.dbuserprovider.persistence;
 
-import lombok.extern.jbosslog.JBossLog;
+import java.security.MessageDigest;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -12,19 +30,26 @@ import org.opensingular.dbuserprovider.util.PBKDF2SHA256HashingUtil;
 import org.opensingular.dbuserprovider.util.PagingUtil;
 import org.opensingular.dbuserprovider.util.PagingUtil.Pageable;
 
-import javax.sql.DataSource;
-import java.security.MessageDigest;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.function.Function;
+import com.google.common.collect.ImmutableMap;
+
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2Factory.Argon2Types;
+import lombok.extern.jbosslog.JBossLog;
 
 
 @JBossLog
 public class UserRepository {
-    
+    private static final Map<String, Argon2Types> ARGON2TYPES = ImmutableMap.of(
+        "Argon2d", Argon2Types.ARGON2d,
+        "Argon2i", Argon2Types.ARGON2i,
+        "Argon2id", Argon2Types.ARGON2id
+    );
+    private static final Map<Argon2Types, Argon2> ARGON2 = ImmutableMap.of(
+        Argon2Types.ARGON2d, Argon2Factory.create(Argon2Types.ARGON2d),
+        Argon2Types.ARGON2i, Argon2Factory.create(Argon2Types.ARGON2i),
+        Argon2Types.ARGON2id, Argon2Factory.create(Argon2Types.ARGON2id)
+    );
     
     private DataSourceProvider  dataSourceProvider;
     private QueryConfigurations queryConfigurations;
@@ -145,6 +170,8 @@ public class UserRepository {
         String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
             return !hash.isEmpty() && BCrypt.checkpw(password, hash);
+        } else if (queryConfigurations.isArgon2()) {
+            return !hash.isEmpty() && ARGON2.get(ARGON2TYPES.get(queryConfigurations.getHashFunction())).verify(hash, password.toCharArray());
         } else {
             String hashFunction = queryConfigurations.getHashFunction();
 
