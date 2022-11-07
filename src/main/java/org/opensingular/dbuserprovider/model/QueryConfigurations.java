@@ -60,6 +60,10 @@ public class QueryConfigurations {
         return hashFunction;
     }
 
+    public boolean isArgon2() {
+        return hashFunction.contains("Argon2");
+    }
+
     public boolean isBlowfish() {
         return hashFunction.toLowerCase().contains("blowfish");
     }
