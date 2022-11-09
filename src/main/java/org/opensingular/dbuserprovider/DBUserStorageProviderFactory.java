@@ -63,6 +63,7 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 model.get("listAll"),
                 model.get("findById"),
                 model.get("findByUsername"),
+                model.get("findByEmail"),
                 model.get("findBySearchTerm"),
                 model.get("findPasswordHash"),
                 model.get("hashFunction"),
@@ -189,6 +190,20 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                                                          "            \"lastName\"," +
                                                          "            \"cpf\"," +
                                                          "            \"fullName\" from users where \"username\" = ? ")
+                                           .add()
+                                           
+                                           .property()
+                                           .name("findByEmail")
+                                           .label("Find user by email SQL query")
+                                           .helpText(DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user email") + PARAMETER_PLACEHOLDER_HELP)
+                                           .type(ProviderConfigProperty.STRING_TYPE)
+                                           .defaultValue("select \"id\"," +
+                                               "            \"username\"," +
+                                               "            \"email\"," +
+                                               "            \"firstName\"," +
+                                               "            \"lastName\"," +
+                                               "            \"cpf\"," +
+                                               "            \"fullName\" from users where \"email\" = ? ")
                                            .add()
         
                                            .property()
