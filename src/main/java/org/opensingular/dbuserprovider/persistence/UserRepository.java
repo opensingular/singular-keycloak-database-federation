@@ -142,10 +142,17 @@ public class UserRepository {
             return Optional.ofNullable(doQuery(queryConfigurations.getCount(), null, this::readInt)).orElse(0);
         } else {
             String query = String.format("select count(*) from (%s) count", queryConfigurations.getFindBySearchTerm());
-            return Optional.ofNullable(doQuery(query, null, this::readInt, search)).orElse(0);
+            return Optional.ofNullable(doQuery(query, null, this::readInt, searchTermParams(search))).orElse(0);
         }
     }
     
+    private Object[] searchTermParams(String search) {
+        if (queryConfigurations.getFindBySearchTermParamsCount() == 1)
+            return new String[] {search};
+        String[] terms = new String[queryConfigurations.getFindBySearchTermParamsCount()];
+        Arrays.fill(terms, search);
+        return terms;
+    }
     
     public Map<String, String> findUserById(String id) {
         return Optional.ofNullable(doQuery(queryConfigurations.getFindById(), null, this::readMap, id))
@@ -169,7 +176,7 @@ public class UserRepository {
         if (search == null || search.isEmpty()) {
             return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
         }
-        return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, search);
+        return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, searchTermParams(search));
     }
     
     public boolean validateCredentials(String username, String password) {
