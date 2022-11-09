@@ -159,9 +159,9 @@ public class DBUserStorageProvider implements UserStorageProvider,
     @Override
     public UserModel getUserByEmail(RealmModel realm, String email) {
         
-        log.infov("lookup user by username: realm={0} email={1}", realm.getId(), email);
+        log.infov("lookup user by email: realm={0} email={1}", realm.getId(), email);
         
-        return getUserByUsername(realm, email);
+        return repository.findUserByEmail(email).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
     }
     
     @Override
