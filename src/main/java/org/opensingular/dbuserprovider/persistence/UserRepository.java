@@ -5,7 +5,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.NotImplementedException;
-import org.mindrot.jbcrypt.BCrypt;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.opensingular.dbuserprovider.DBUserStorageException;
 import org.opensingular.dbuserprovider.model.QueryConfigurations;
 import org.opensingular.dbuserprovider.util.PBKDF2SHA256HashingUtil;
@@ -144,7 +144,7 @@ public class UserRepository {
     public boolean validateCredentials(String username, String password) {
         String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
-            return !hash.isEmpty() && BCrypt.checkpw(password, hash);
+            return !hash.isEmpty() && BCrypt.verifyer().verify(password.toCharArray(), hash).verified;
         } else {
             String hashFunction = queryConfigurations.getHashFunction();
 
