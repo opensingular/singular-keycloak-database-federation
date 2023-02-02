@@ -64,6 +64,10 @@ public class QueryConfigurations {
         return hashFunction.toLowerCase().contains("blowfish");
     }
 
+    public boolean isPosixCrypt() {
+        return hashFunction.toLowerCase().contains("posix");
+    }
+
     public boolean getAllowKeycloakDelete() {
         return allowKeycloakDelete;
     }

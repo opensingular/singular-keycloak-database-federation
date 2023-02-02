@@ -5,6 +5,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.codec.digest.Crypt;
 import org.mindrot.jbcrypt.BCrypt;
 import org.opensingular.dbuserprovider.DBUserStorageException;
 import org.opensingular.dbuserprovider.model.QueryConfigurations;
@@ -145,6 +146,8 @@ public class UserRepository {
         String hash = Optional.ofNullable(doQuery(queryConfigurations.getFindPasswordHash(), null, this::readString, username)).orElse("");
         if (queryConfigurations.isBlowfish()) {
             return !hash.isEmpty() && BCrypt.checkpw(password, hash);
+        } else if (queryConfigurations.isPosixCrypt()) {
+            return !hash.isEmpty() && hash.equals(Crypt.crypt(password, hash));
         } else {
             String hashFunction = queryConfigurations.getHashFunction();
 
