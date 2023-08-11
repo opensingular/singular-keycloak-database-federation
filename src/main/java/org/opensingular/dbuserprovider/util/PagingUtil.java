@@ -2,7 +2,7 @@ package org.opensingular.dbuserprovider.util;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.pagination.LimitHandler;
-import org.hibernate.engine.spi.RowSelection;
+import org.hibernate.query.spi.Limit;
 import org.opensingular.dbuserprovider.DBUserStorageException;
 import org.opensingular.dbuserprovider.persistence.RDBMS;
 
@@ -31,8 +31,7 @@ public class PagingUtil {
 
         final Dialect dialect = RDBMS.getDialect();
 
-        RowSelection rowSelection = new RowSelection();
-        rowSelection.setFetchSize(pageable.maxResults);
+        Limit rowSelection = new Limit();
         rowSelection.setFirstRow(pageable.firstResult);
         rowSelection.setMaxRows(pageable.maxResults);
 
