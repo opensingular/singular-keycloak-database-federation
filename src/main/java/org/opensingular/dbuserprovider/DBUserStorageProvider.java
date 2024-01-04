@@ -175,16 +175,6 @@ public class DBUserStorageProvider implements UserStorageProvider,
     }
     
     @Override
-    public int getUsersCount(RealmModel realm, String search) {
-        return repository.getUsersCount(search);
-    }
-    
-    @Override
-    public int getUsersCount(RealmModel realm, String search, Set<String> groupIds) {
-        return repository.getUsersCount(search);
-    }
-    
-    @Override
     public int getUsersCount(RealmModel realm, Map<String, String> params) {
         return repository.getUsersCount(null);
     }
@@ -200,11 +190,11 @@ public class DBUserStorageProvider implements UserStorageProvider,
     }
     
     @Override
-    public Stream<UserModel> searchForUserStream(RealmModel realm, String search, Integer firstResult,
-        Integer maxResults)
+    public Stream<UserModel> searchForUserStream(RealmModel realm, Map<String,String> params)
     {
-        log.infov("list users: realm={0} firstResult={1} maxResults={2}", realm.getId(), firstResult, maxResults);
-        return internalSearchForUser(search, realm, new PagingUtil.Pageable(firstResult, maxResults));
+        log.infov("search for users with params (without pagination): realm={0} params={1}", realm.getId(), params);
+        
+        return internalSearchForUser(params.get("keycloak.session.realm.users.query.search"), realm, null);
     }
     
     @Override
@@ -212,7 +202,8 @@ public class DBUserStorageProvider implements UserStorageProvider,
         Integer maxResults)
     {
         log.infov("search for users with params: realm={0} params={1}", realm.getId(), params);
-        return internalSearchForUser(params.values().stream().findFirst().orElse(null), realm, null);
+        
+        return internalSearchForUser(params.get("keycloak.session.realm.users.query.search"), realm, new PagingUtil.Pageable(firstResult, maxResults));
     }
     
     @Override

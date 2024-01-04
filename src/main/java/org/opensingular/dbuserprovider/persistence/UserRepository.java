@@ -155,25 +155,35 @@ public class UserRepository {
     }
     
     public Map<String, String> findUserById(String id) {
+        log.infov("Find by id: {0} ", id);
+        
         return Optional.ofNullable(doQuery(queryConfigurations.getFindById(), null, this::readMap, id))
                        .orElse(Collections.emptyList())
                        .stream().findFirst().orElse(null);
     }
     
     public Optional<Map<String, String>> findUserByUsername(String username) {
+        log.infov("Find by username: {0} ", username);
+        
         return Optional.ofNullable(doQuery(queryConfigurations.getFindByUsername(), null, this::readMap, username))
                        .orElse(Collections.emptyList())
                        .stream().findFirst();
     }
     
     public Optional<Map<String, String>> findUserByEmail(String email) {
+        log.infov("Find by email: {0} ", email);
+        
         return Optional.ofNullable(doQuery(queryConfigurations.getFindByEmail(), null, this::readMap, email))
             .orElse(Collections.emptyList())
             .stream().findFirst();
     }
     
     public List<Map<String, String>> findUsers(String search, PagingUtil.Pageable pageable) {
-        if (search == null || search.isEmpty()) {
+        log.infov("Search user by term: {0} ", search);
+        
+        search = search.replace("*", "%");
+        
+        if (search == null || search.isEmpty() || search.equals("%")) {
             return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
         }
         return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, searchTermParams(search));
@@ -190,7 +200,7 @@ public class UserRepository {
 
             if(hashFunction.equals("PBKDF2-SHA256")){
                 String[] components = hash.split("\\$");
-                return new PBKDF2SHA256HashingUtil(password, components[2], Integer.valueOf(components[1])).validatePassword(components[3]);
+                return new PBKDF2SHA256HashingUtil(password, components[2], Integer.parseInt(components[1])).validatePassword(components[3]);
             }
 
             MessageDigest digest   = DigestUtils.getDigest(hashFunction);
