@@ -8,7 +8,8 @@
 
     <artifactId>singular-user-storage-provider</artifactId>
     <groupId>org.opensingular</groupId>
-    <version>2.4.6</version>
+    <name>singular-user-storage-provider</name>
+    <version>2.4.7</version>
 
     <dependencies>
         <dependency>
@@ -50,7 +51,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.3-jre</version>
+            <version>33.1.0-jre</version>
         </dependency>
 
         <dependency>
@@ -85,7 +86,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.16.0</version>
+            <version>1.16.1</version>
         </dependency>
 
 
@@ -107,14 +108,14 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>8.2.0</version>
+            <version>8.3.0</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/org/postgresql/postgresql/ -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.1</version>
+            <version>42.7.3</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/com/oracle/ojdbc/ojdbc8/ -->
@@ -155,7 +156,7 @@
 
 
     <build>
-        <finalName>singular-user-storage-provider</finalName>
+        <finalName>${project.name}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <!-- https://repo1.maven.org/maven2/org/wildfly/plugins/wildfly-maven-plugin/ -->
@@ -199,10 +200,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- https://repo1.maven.org/maven2/org/projectlombok/lombok/ -->
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <!-- https://repo1.maven.org/maven2/org/jboss/logging/jboss-logging/ -->
         <jboss-logging.version>3.5.3.Final</jboss-logging.version>
-        <keycloak.version>23.0.3</keycloak.version>
+        <keycloak.version>24.0.2</keycloak.version>
         <!-- https://repo1.maven.org/maven2/com/google/auto/service/auto-service/ -->
         <auto-service.version>1.1.1</auto-service.version>
         <jboss.home>target/keycloak</jboss.home>

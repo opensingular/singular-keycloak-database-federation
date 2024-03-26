@@ -117,6 +117,7 @@ public class PreparedStatementParameterCollector implements PreparedStatement {
         parameters.put(parameterIndex, x);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) {
         parameters.put(parameterIndex, x);
