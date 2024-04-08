@@ -211,8 +211,9 @@ public class DBUserStorageProvider implements UserStorageProvider,
     public Stream<UserModel> searchForUserStream(RealmModel realm, Map<String, String> params, Integer firstResult,
         Integer maxResults)
     {
+        String searchTerm = params.getOrDefault("keycloak.session.realm.users.query.search", "");
         log.infov("search for users with params: realm={0} params={1}", realm.getId(), params);
-        return internalSearchForUser(params.values().stream().findFirst().orElse(null), realm, null);
+        return internalSearchForUser(searchTerm, realm, null);
     }
     
     @Override
