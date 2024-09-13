@@ -181,9 +181,13 @@ public class UserRepository {
     public List<Map<String, String>> findUsers(String search, PagingUtil.Pageable pageable) {
         log.infov("Search user by term: {0} ", search);
         
+        if (search == null) {
+            return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
+        }
+        
         search = search.replace("*", "%");
         
-        if (search == null || search.isEmpty() || search.equals("%")) {
+        if (search.isEmpty() || search.equals("%")) {
             return doQuery(queryConfigurations.getListAll(), pageable, this::readMap);
         }
         return doQuery(queryConfigurations.getFindBySearchTerm(), pageable, this::readMap, searchTermParams(search));
