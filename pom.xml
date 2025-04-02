@@ -9,7 +9,7 @@
     <artifactId>singular-user-storage-provider</artifactId>
     <groupId>org.opensingular</groupId>
     <name>singular-user-storage-provider</name>
-    <version>2.4.11</version>
+    <version>2.4.12</version>
 
     <dependencies>
         <dependency>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.3.1-jre</version>
+            <version>33.4.6-jre</version>
         </dependency>
 
         <dependency>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>6.0.0</version>
+            <version>6.3.0</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/ -->
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.17.1</version>
+            <version>1.18.0</version>
         </dependency>
 
 
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.17.0</version>
+            <version>2.18.0</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/net/sourceforge/jtds/jtds/ -->
@@ -108,14 +108,14 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>9.1.0</version>
+            <version>9.2.0</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/org/postgresql/postgresql/ -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.4</version>
+            <version>42.7.5</version>
         </dependency>
 
         <!-- https://repo1.maven.org/maven2/com/oracle/ojdbc/ojdbc8/ -->
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.6.1.Final</version>
+            <version>6.6.12.Final</version>
             <scope>provided</scope>
         </dependency>
 
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
-            <version>2.11</version>
+            <version>2.12</version>
         </dependency>
 
     </dependencies>
@@ -163,7 +163,7 @@
                 <!-- https://repo1.maven.org/maven2/org/wildfly/plugins/wildfly-maven-plugin/ -->
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>5.0.1.Final</version>
+                <version>5.1.2.Final</version>
                 <configuration>
                     <skip>false</skip>
                 </configuration>
@@ -201,11 +201,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- https://repo1.maven.org/maven2/org/projectlombok/lombok/ -->
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <!-- https://repo1.maven.org/maven2/org/jboss/logging/jboss-logging/ -->
         <jboss-logging.version>3.6.1.Final</jboss-logging.version>
 
-        <keycloak.version>26.0.5</keycloak.version>
+        <keycloak.version>26.1.4</keycloak.version>
 
         <!-- https://repo1.maven.org/maven2/com/google/auto/service/auto-service/ -->
         <auto-service.version>1.1.1</auto-service.version>
