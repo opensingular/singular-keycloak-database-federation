@@ -68,7 +68,9 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 model.get("hashFunction"),
                 rdbms,
                 model.get("allowKeycloakDelete", false),
-                model.get("allowDatabaseToOverwriteKeycloak", false)
+                model.get("allowDatabaseToOverwriteKeycloak", false),
+                model.get("syncEnabled", false), 
+                model.get("unlinkEnabled", false)
         );
         return providerConfig;
     }
@@ -135,6 +137,20 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                                            .label("Allow DB Attributes to Overwrite Keycloak")
                                            // Technical details for the following comment: we aggregate both the existing Keycloak version and the DB version of an attribute in a Set, but since e.g. email is not a list of values on the Keycloak User, the new email is never set on it.
                                            .helpText("By default, once a user is loaded in Keycloak, its attributes (e.g. 'email') stay as they are in Keycloak even if an attribute of the same name now returns a different value through the query.  Activate this option to have all attributes set in the SQL query to always overwrite the existing user attributes in Keycloak (e.g. if Keycloak user has email 'test@test.com' but the query fetches a field named 'email' that has a value 'example@exemple.com', the Keycloak user will now have email attribute = 'example@exemple.com'). This behavior works with NO_CAHCE configuration. In case you set this flag under a cached configuration, the user attributes will be reload if: 1) the cached value is older than 500ms and 2) username or e-mail does not match cached values.")
+                                           .type(ProviderConfigProperty.BOOLEAN_TYPE)
+                                           .defaultValue("false")
+                                           .add()
+                                           .property()
+                                           .name("syncEnabled")
+                                           .label("Enable User Synchronization")
+                                           .helpText("If enabled, user data from the external database will be synchronized to Keycloak's local storage.")
+                                           .type(ProviderConfigProperty.BOOLEAN_TYPE)
+                                           .defaultValue("false")
+                                           .add()
+                                           .property()
+                                           .name("unlinkEnabled")
+                                           .label("Enable User Unlinking")
+                                           .helpText("If enabled, users can be unlinked from the federation, allowing them to set local Keycloak credentials.")
                                            .type(ProviderConfigProperty.BOOLEAN_TYPE)
                                            .defaultValue("false")
                                            .add()

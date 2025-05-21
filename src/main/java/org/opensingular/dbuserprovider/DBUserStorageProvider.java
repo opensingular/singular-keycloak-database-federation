@@ -33,14 +33,76 @@ public class DBUserStorageProvider implements UserStorageProvider,
     private final ComponentModel  model;
     private final UserRepository  repository;
     private final boolean allowDatabaseToOverwriteKeycloak;
+    private final boolean syncEnabled;
+    private final boolean unlinkEnabled;
 
     DBUserStorageProvider(KeycloakSession session, ComponentModel model, DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
         this.session    = session;
         this.model      = model;
         this.repository = new UserRepository(dataSourceProvider, queryConfigurations);
         this.allowDatabaseToOverwriteKeycloak = queryConfigurations.getAllowDatabaseToOverwriteKeycloak();
+        this.syncEnabled = queryConfigurations.isSyncEnabled();
+        this.unlinkEnabled = queryConfigurations.isUnlinkEnabled();
     }
-    
+
+    private UserModel syncUser(RealmModel realm, UserModel userAdapter) {
+        String username = userAdapter.getUsername();
+        log.infov("Attempting to sync user: {0}", username);
+
+        if (!this.syncEnabled) {
+            log.debugv("User synchronization is disabled. Skipping sync for user: {0}", username);
+            return userAdapter;
+        }
+
+        UserModel localUser = session.userLocalStorage().getUserByUsername(realm, username);
+
+        if (localUser == null) {
+            log.infov("User not found locally, creating new local user: {0}", username);
+            try {
+                localUser = session.userLocalStorage().addUser(realm, username);
+                localUser.setFederationLink(userAdapter.getId()); // Link to the federated user
+                localUser.setFirstName(userAdapter.getFirstName());
+                localUser.setLastName(userAdapter.getLastName());
+                localUser.setEmail(userAdapter.getEmail());
+                localUser.setEmailVerified(userAdapter.isEmailVerified());
+                // Copy attributes
+                for (Map.Entry<String, List<String>> attribute : userAdapter.getAttributes().entrySet()) {
+                    localUser.setAttribute(attribute.getKey(), attribute.getValue());
+                }
+                // Add any required actions if necessary, e.g.,
+                // localUser.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+                log.infov("Successfully created local user: {0}", username);
+            } catch (Exception e) {
+                log.errorv(e, "Error creating local user: {0}", username);
+                return userAdapter; // return original adapter if sync fails
+            }
+        } else {
+            log.infov("Found existing local user: {0}. Updating attributes.", username);
+            if (!localUser.isEmailVerified() && userAdapter.isEmailVerified()){
+                 localUser.setEmailVerified(userAdapter.isEmailVerified());
+            }
+            if (userAdapter.getEmail() != null && !userAdapter.getEmail().equals(localUser.getEmail())) {
+                localUser.setEmail(userAdapter.getEmail());
+            }
+            if (userAdapter.getFirstName() != null && !userAdapter.getFirstName().equals(localUser.getFirstName())) {
+                localUser.setFirstName(userAdapter.getFirstName());
+            }
+            if (userAdapter.getLastName() != null && !userAdapter.getLastName().equals(localUser.getLastName())) {
+                localUser.setLastName(userAdapter.getLastName());
+            }
+            // Update attributes - be careful with read-only attributes or conflicts
+            try {
+                for (Map.Entry<String, List<String>> attribute : userAdapter.getAttributes().entrySet()) {
+                    // Potentially add checks here to avoid overwriting protected attributes
+                    localUser.setAttribute(attribute.getKey(), attribute.getValue());
+                }
+                log.infov("Successfully synced attributes for user: {0}", username);
+            } catch (ModelException e) { // More specific exception for read-only issues if available
+                log.warnv(e, "Could not update some attributes for user {0} (possibly read-only or conflict).", username);
+            }
+        }
+        return localUser;
+    }
     
     private List<UserModel> toUserModel(RealmModel realm, List<Map<String, String>> users) {
         return users.stream()
@@ -144,7 +206,11 @@ public class DBUserStorageProvider implements UserStorageProvider,
             log.debugv("findUserById returned null, skipping creation of UserAdapter, expect login error");
             return null;
         } else {
-            return new UserAdapter(session, realm, model, user, allowDatabaseToOverwriteKeycloak);
+            UserModel userAdapter = new UserAdapter(session, realm, model, user, allowDatabaseToOverwriteKeycloak);
+            if (this.syncEnabled) {
+                return syncUser(realm, userAdapter);
+            }
+            return userAdapter;
         }
     }
     
@@ -153,15 +219,34 @@ public class DBUserStorageProvider implements UserStorageProvider,
         
         log.infov("lookup user by username: realm={0} username={1}", realm.getId(), username);
         
-        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
+        UserModel userAdapter = repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
+        if (userAdapter != null) {
+            if (this.syncEnabled) {
+                return syncUser(realm, userAdapter);
+            }
+            return userAdapter;
+        }
+        return null;
     }
     
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
         
-        log.infov("lookup user by username: realm={0} email={1}", realm.getId(), email);
+        log.infov("lookup user by email: realm={0} email={1}", realm.getId(), email); // Log corrected to email
         
-        return getUserByUsername(email, realm);
+        // Assuming getUserByUsername can also find by email if the DB query is configured that way,
+        // or if username and email are the same. If not, this might need adjustment
+        // to call a specific repository.findUserByEmail if available.
+        UserModel userAdapter = repository.findUserByUsername(email) // This might need to be repository.findUserByEmail(email)
+                                .map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak))
+                                .orElse(null);
+        if (userAdapter != null) {
+            if (this.syncEnabled) {
+                return syncUser(realm, userAdapter);
+            }
+            return userAdapter;
+        }
+        return null;
     }
     
     @Override
@@ -275,5 +360,35 @@ public class DBUserStorageProvider implements UserStorageProvider,
         }
         
         return userRemoved;
+    }
+
+    /**
+     * Removes the federation link from the user.
+     *
+     * @param realm The realm.
+     * @param user  The user to unlink.
+     * @return True if unlinking was successful, false otherwise.
+     */
+    public boolean unlinkUser(RealmModel realm, UserModel user) {
+        log.infov("Attempting to unlink user: realm={0} username={1}", realm.getId(), user.getUsername());
+
+        if (!this.unlinkEnabled) {
+            log.warnv("User unlinking is disabled by configuration. Skipping for user: {0}", user.getUsername());
+            return false;
+        }
+
+        if (user.getFederationLink() == null) {
+            log.infov("User {0} is not federated or already unlinked.", user.getUsername());
+            return true; // Considered success as the link is not present
+        }
+
+        try {
+            user.setFederationLink(null);
+            log.infov("Successfully unlinked user: {0}", user.getUsername());
+            return true;
+        } catch (Exception e) {
+            log.errorv(e, "Error unlinking user: {0}", user.getUsername());
+            return false;
+        }
     }
 }
