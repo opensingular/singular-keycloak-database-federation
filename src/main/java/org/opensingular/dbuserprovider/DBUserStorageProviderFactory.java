@@ -63,6 +63,7 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                 model.get("listAll"),
                 model.get("findById"),
                 model.get("findByUsername"),
+                model.get("findByEmail"),
                 model.get("findBySearchTerm"),
                 model.get("findPasswordHash"),
                 model.get("hashFunction"),
@@ -190,6 +191,20 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                                                          "            \"cpf\"," +
                                                          "            \"fullName\" from users where \"username\" = ? ")
                                            .add()
+                                           
+                                           .property()
+                                           .name("findByEmail")
+                                           .label("Find user by email SQL query")
+                                           .helpText(DEFAULT_HELP_TEXT + String.format(PARAMETER_HELP, "user email") + PARAMETER_PLACEHOLDER_HELP)
+                                           .type(ProviderConfigProperty.STRING_TYPE)
+                                           .defaultValue("select \"id\"," +
+                                               "            \"username\"," +
+                                               "            \"email\"," +
+                                               "            \"firstName\"," +
+                                               "            \"lastName\"," +
+                                               "            \"cpf\"," +
+                                               "            \"fullName\" from users where \"email\" = ? ")
+                                           .add()
         
                                            .property()
                                            .name("findBySearchTerm")
@@ -217,7 +232,7 @@ public class DBUserStorageProviderFactory implements UserStorageProviderFactory<
                                            .label("Password hash function")
                                            .helpText("Hash type used to match passwrod (md* e sha* uses hex hash digest)")
                                            .type(ProviderConfigProperty.LIST_TYPE)
-                                           .options("Blowfish (bcrypt)", "MD2", "MD5", "SHA-1", "SHA-256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA-512", "PBKDF2-SHA256")
+                                           .options("Blowfish (bcrypt)", "MD2", "MD5", "SHA-1", "SHA-256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA-512", "PBKDF2-SHA256", "Argon2d", "Argon2i", "Argon2id")
                                            .defaultValue("SHA-1")
                                            .add()
                                            .build();
