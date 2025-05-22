@@ -201,14 +201,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <!-- https://repo1.maven.org/maven2/org/projectlombok/lombok/ -->
         <lombok.version>1.18.30</lombok.version>
         <!-- https://repo1.maven.org/maven2/org/jboss/logging/jboss-logging/ -->
         <jboss-logging.version>3.5.3.Final</jboss-logging.version>
-        <keycloak.version>24.0.1</keycloak.version>
+        <keycloak.version>26.2.0</keycloak.version>
         <!-- https://repo1.maven.org/maven2/com/google/auto/service/auto-service/ -->
         <auto-service.version>1.0-rc5</auto-service.version>
         <jboss.home>target/keycloak</jboss.home>
