@@ -8,7 +8,7 @@
 
     <artifactId>singular-user-storage-provider</artifactId>
     <groupId>org.opensingular</groupId>
-    <version>2.4</version>
+    <version>2.4.6</version>
 
     <dependencies>
         <dependency>
@@ -26,6 +26,19 @@
         </dependency>
 
         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-model-jpa</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>${jboss-logging.version}</version>
@@ -33,10 +46,11 @@
         </dependency>
 
         <!-- demonstrates usage of custom dependencies in an ear -->
+        <!-- https://repo1.maven.org/maven2/com/google/guava/guava/ -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>33.0.0-jre</version>
         </dependency>
 
         <dependency>
@@ -53,66 +67,74 @@
         </dependency>
 
 
+        <!-- https://repo1.maven.org/maven2/com/zaxxer/HikariCP/ -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>4.0.3</version>
+            <version>5.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-
+        <!-- https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/ -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.14.0</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/commons-codec/commons-codec/ -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
+            <version>1.16.1</version>
         </dependency>
 
 
+        <!-- https://repo1.maven.org/maven2/commons-io/commons-io/ -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
+            <version>2.15.1</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/net/sourceforge/jtds/jtds/ -->
         <dependency>
             <groupId>net.sourceforge.jtds</groupId>
             <artifactId>jtds</artifactId>
             <version>1.3.1</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/ -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.12</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/org/postgresql/postgresql/ -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.19</version>
+            <version>42.7.1</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/ -->
         <dependency>
-            <groupId>com.ibm.db2.jcc</groupId>
-            <artifactId>db2jcc</artifactId>
-            <version>db2jcc4</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <version>23.3.0.23.09</version>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/org/mindrot/jbcrypt/ -->
         <dependency>
-            <groupId>com.oracle.ojdbc</groupId>
-            <artifactId>ojdbc8</artifactId>
-            <version>19.3.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>at.favre.lib</groupId>
-            <artifactId>bcrypt</artifactId>
-            <version>0.9.0</version>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -124,10 +146,16 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.4.18.Final</version>
+            <version>6.4.4.Final</version>
             <scope>provided</scope>
         </dependency>
 
+        <!-- https://repo1.maven.org/maven2/de/mkammerer/argon2-jvm/ -->
+        <dependency>
+            <groupId>de.mkammerer</groupId>
+            <artifactId>argon2-jvm</artifactId>
+            <version>2.11</version>
+        </dependency>
 
     </dependencies>
 
@@ -136,9 +164,10 @@
         <finalName>singular-user-storage-provider</finalName>
         <plugins>
             <plugin>
+                <!-- https://repo1.maven.org/maven2/org/wildfly/plugins/wildfly-maven-plugin/ -->
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>2.0.2.Final</version>
+                <version>4.2.0.Final</version>
                 <configuration>
                     <skip>false</skip>
                 </configuration>
@@ -159,9 +188,10 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/ -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.3.0</version>
                 <configuration>
                     <outputDirectory>${project.basedir}/dist</outputDirectory>
                 </configuration>
@@ -174,9 +204,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <lombok.version>1.18.22</lombok.version>
-        <jboss-logging.version>3.3.1.Final</jboss-logging.version>
-        <keycloak.version>17.0.1</keycloak.version>
+        <!-- https://repo1.maven.org/maven2/org/projectlombok/lombok/ -->
+        <lombok.version>1.18.30</lombok.version>
+        <!-- https://repo1.maven.org/maven2/org/jboss/logging/jboss-logging/ -->
+        <jboss-logging.version>3.5.3.Final</jboss-logging.version>
+        <keycloak.version>24.0.1</keycloak.version>
+        <!-- https://repo1.maven.org/maven2/com/google/auto/service/auto-service/ -->
         <auto-service.version>1.0-rc5</auto-service.version>
         <jboss.home>target/keycloak</jboss.home>
     </properties>
