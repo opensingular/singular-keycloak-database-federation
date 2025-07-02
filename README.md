@@ -1,3 +1,5 @@
+> ⚠️ **IMPORTANT:** This repository is not currently maintained. You're welcome to fork it, improve it, and use it as you wish.
+
 # singular-keycloak-database-federation
 
 
@@ -37,7 +39,7 @@ Keycloak User Storage SPI for Relational Databases (Keycloak User Federation, su
 
 ## Usage
 
-    Fully compatible with Singular Studio NOCODE. See https://www.studio.opensingular.com/
+    Fully compatible with Singular Studio NOCODE. See https://singular.tec.br
     
 
 ## Configuration
