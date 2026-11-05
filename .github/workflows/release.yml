@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '8'
+          java-version: '17'
           cache: maven
 
       - name: Build plugin
@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '8'
+          java-version: '17'
           cache: maven
 
       - name: Build EAR test artifact
@@ -71,7 +71,7 @@ jobs:
           mvn -B dependency:copy-dependencies \
             -DincludeScope=provided \
             -Dmdep.prependGroupId=true \
-            -DincludeArtifactIds=hibernate-core,jboss-logging,javax.persistence-api,javassist,byte-buddy,antlr,jboss-transaction-api_1.2_spec,jandex,classmate,javax.activation-api,dom4j,hibernate-commons-annotations,jaxb-api,jaxb-runtime,txw2,istack-commons-runtime,stax-ex,FastInfoset,slf4j-api \
+            -DincludeArtifactIds=jboss-logging,slf4j-api \
             -DoutputDirectory=target/ear-provided
           mkdir -p target/ear-content/META-INF
           version=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version | tail -n 1)
@@ -134,7 +134,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '8'
+          java-version: '17'
           cache: maven
 
       - name: Create next version tag
@@ -176,7 +176,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '8'
+          java-version: '17'
           cache: maven
 
       - name: Build release artifacts
@@ -194,7 +194,7 @@ jobs:
           mvn -B dependency:copy-dependencies \
             -DincludeScope=provided \
             -Dmdep.prependGroupId=true \
-            -DincludeArtifactIds=hibernate-core,jboss-logging,javax.persistence-api,javassist,byte-buddy,antlr,jboss-transaction-api_1.2_spec,jandex,classmate,javax.activation-api,dom4j,hibernate-commons-annotations,jaxb-api,jaxb-runtime,txw2,istack-commons-runtime,stax-ex,FastInfoset,slf4j-api \
+            -DincludeArtifactIds=jboss-logging,slf4j-api \
             -DoutputDirectory=target/ear-provided
 
       - name: Create EAR bundle
@@ -259,7 +259,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '8'
+          java-version: '17'
           cache: maven
 
       - name: Build release artifacts
@@ -277,7 +277,7 @@ jobs:
           mvn -B dependency:copy-dependencies \
             -DincludeScope=provided \
             -Dmdep.prependGroupId=true \
-            -DincludeArtifactIds=hibernate-core,jboss-logging,javax.persistence-api,javassist,byte-buddy,antlr,jboss-transaction-api_1.2_spec,jandex,classmate,javax.activation-api,dom4j,hibernate-commons-annotations,jaxb-api,jaxb-runtime,txw2,istack-commons-runtime,stax-ex,FastInfoset,slf4j-api \
+            -DincludeArtifactIds=jboss-logging,slf4j-api \
             -DoutputDirectory=target/ear-provided
 
       - name: Create EAR bundle

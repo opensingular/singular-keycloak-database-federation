@@ -1,21 +1,10 @@
 package org.opensingular.dbuserprovider.util;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.pagination.LimitHandler;
-import org.hibernate.engine.spi.RowSelection;
-import org.opensingular.dbuserprovider.DBUserStorageException;
 import org.opensingular.dbuserprovider.persistence.RDBMS;
 
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Locale;
 
 public class PagingUtil {
-
-    @SuppressWarnings("RegExpRedundantEscape")
-    private static final Pattern SINGLE_QUESTION_MARK_REGEX = Pattern.compile("(^|[^\\?])(\\?)([^\\?]|$)");
-
 
     public static class Pageable {
         private final int firstResult;
@@ -27,48 +16,21 @@ public class PagingUtil {
         }
     }
 
-    public static String formatScriptWithPageable(String query, Pageable pageable, RDBMS RDBMS) {
-
-        final Dialect dialect = RDBMS.getDialect();
-
-        RowSelection rowSelection = new RowSelection();
-        rowSelection.setFetchSize(pageable.maxResults);
-        rowSelection.setFirstRow(pageable.firstResult);
-        rowSelection.setMaxRows(pageable.maxResults);
-
-        String escapedSQL = escapeQuestionMarks(query);
-
-        StringBuilder processedSQL;
-        try {
-            LimitHandler limitHandler = dialect.getLimitHandler();
-            processedSQL = new StringBuilder(limitHandler.processSql(escapedSQL, rowSelection));
-            int                                 col       = 1;
-            PreparedStatementParameterCollector collector = new PreparedStatementParameterCollector();
-            col += limitHandler.bindLimitParametersAtStartOfQuery(rowSelection, collector, col);
-            limitHandler.bindLimitParametersAtEndOfQuery(rowSelection, collector, col);
-
-            Map<Integer, Object> parameters = collector.getParameters();
-            for (int i = 1; i <= parameters.keySet().size(); i++) {
-                Matcher matcher = SINGLE_QUESTION_MARK_REGEX.matcher(processedSQL);
-                if (matcher.find()) {
-                    String str = String.valueOf(parameters.get(i));
-                    processedSQL.replace(matcher.start(2), matcher.end(2), str);
-                }
-            }
-            return unescapeQuestionMarks(processedSQL.toString());
-
-        } catch (SQLException e) {
-            throw new DBUserStorageException(e.getMessage(), e);
+    public static String formatScriptWithPageable(String query, Pageable pageable, RDBMS rdbms) {
+        int firstResult = Math.max(pageable.firstResult, 0);
+        int maxResults  = Math.max(pageable.maxResults, 0);
+        switch (rdbms) {
+            case POSTGRESQL:
+            case MYSQL:
+                return String.format("%s LIMIT %d OFFSET %d", query, maxResults, firstResult);
+            case ORACLE:
+                return String.format("%s OFFSET %d ROWS FETCH NEXT %d ROWS ONLY", query, firstResult, maxResults);
+            case SQL_SERVER:
+                // OFFSET/FETCH requires an ORDER BY clause on SQL Server
+                String orderBy = query.toLowerCase(Locale.ROOT).contains("order by") ? "" : " ORDER BY (SELECT NULL)";
+                return String.format("%s%s OFFSET %d ROWS FETCH NEXT %d ROWS ONLY", query, orderBy, firstResult, maxResults);
+            default:
+                return query;
         }
     }
-
-
-    private static String unescapeQuestionMarks(String sql) {
-        return sql.replaceAll("\\?\\?", "?");
-    }
-
-    private static String escapeQuestionMarks(String sql) {
-        return sql.replaceAll("\\?", "??");
-    }
-
 }

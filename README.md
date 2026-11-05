@@ -1,7 +1,7 @@
 # singular-keycloak-database-federation
 
 
-### Compatible with Keycloak 17+ quarkus based.
+### Compatible with Keycloak 26+ quarkus based (built against Keycloak 26.8.0, requires Java 17+).
 **For older versions look at older_versions branch.
 
 

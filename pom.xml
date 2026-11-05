@@ -26,6 +26,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-server-spi-private</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>${jboss-logging.version}</version>
@@ -56,7 +63,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>4.0.3</version>
+            <version>5.1.0</version>
         </dependency>
 
 
@@ -115,14 +122,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.4.18.Final</version>
-            <scope>provided</scope>
-        </dependency>
-
-
     </dependencies>
 
 
@@ -130,11 +129,23 @@
         <finalName>singular-user-storage-provider</finalName>
         <plugins>
             <plugin>
-                <groupId>org.wildfly.plugins</groupId>
-                <artifactId>wildfly-maven-plugin</artifactId>
-                <version>2.0.2.Final</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
-                    <skip>false</skip>
+                    <release>17</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -165,14 +176,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
 
-        <lombok.version>1.18.22</lombok.version>
-        <jboss-logging.version>3.3.1.Final</jboss-logging.version>
-        <keycloak.version>12.0.3</keycloak.version>
-        <auto-service.version>1.0-rc5</auto-service.version>
-        <jboss.home>target/keycloak</jboss.home>
+        <lombok.version>1.18.36</lombok.version>
+        <jboss-logging.version>3.6.1.Final</jboss-logging.version>
+        <keycloak.version>26.8.0</keycloak.version>
+        <auto-service.version>1.1.1</auto-service.version>
     </properties>
 
     <dependencyManagement>
